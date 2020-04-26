@@ -1,0 +1,5 @@
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T0.png, 1000, 1048, 852, 900
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T2.png, 1730, 1778, 575, 623
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T3.png, 2231, 2279, 846, 894
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T4.png, 1005, 1053, 838, 886
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T5.png, 2713, 2761, 1366, 1414

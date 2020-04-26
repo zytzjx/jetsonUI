@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>icons/cursor.png</file>
+    <file>icons/keyboard.png</file>
+    <file>icons/yes.png</file>
+    <file>icons/no.png</file>
+    <file>icons/warning.png</file>
+</qresource>
+</RCC>

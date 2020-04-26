@@ -1,0 +1,12 @@
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T0.png, 1000, 1048, 852, 900
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T1.png, 1006, 1054, 628, 676
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T2.png, 1730, 1778, 575, 623
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T3.png, 2231, 2279, 846, 894
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T0.png, 1636, 1684, 1782, 1830
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T0.png, 2243, 2291, 850, 898
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T1.png, 2302, 2350, 521, 569
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T2.png, 1739, 1787, 592, 640
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T3.png, 988, 1036, 621, 669
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T4.png, 1005, 1053, 838, 886
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T5.png, 2713, 2761, 1366, 1414
+/home/pi/Desktop/pyUI/profiles/iphone6s_top_1/top/T6.png, 2701, 2749, 1530, 1578

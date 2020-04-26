@@ -1,0 +1,19 @@
+#cp /etc/systemd/system/psirun.service
+#sudo chmod 644 /etc/systemd/system/psirun.service
+#sudo systemctl daemon-reload
+#sudo systemctl enable psirun.service
+#sudo systemctl start psirun.service
+
+[Unit]
+Description=PSI Futuredial Service
+After=graphical.target
+
+[Service]
+Environment=DISPLAY=:0.0
+Type=simple
+User=pi
+Restart=always
+ExecStart=python3 /home/pi/Desktop/pyUI/serversingletask.py -style top
+
+[Install]
+WantedBy=graphical.target
