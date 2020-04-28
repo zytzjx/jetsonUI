@@ -80,6 +80,10 @@ class StatusCheckThread(QThread):
         self.exit_event = threading.Event()
         self.mylock = myvar
         self.threhold = 40000
+        #sudo usermod -a -G tty qa
+        #sudo chown qa /dev/ttyUSB0
+        os.system("echo %s | sudo -S usermod -a -G tty qa" % myconstdef.PASSWORD)
+        os.system("echo %s | sudo -S chown qa /dev/ttyUSB0" % myconstdef.PASSWORD)
 
     def setThrehold(self, value):
         self.threhold = value

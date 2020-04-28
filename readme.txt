@@ -109,10 +109,10 @@ sudo make install
  
 #passwordless
 ssh-keygen -t rsa
-ssh pi@192.168.1.25 mkdir -p .ssh
-cat ~/.ssh/id_rsa.pub | ssh pi@192.168.1.25 'cat >> .ssh/authorized_keys'
-ssh pi@192.168.1.25 "chmod 700 .ssh; chmod 640 .ssh/authorized_keys"
-ssh pi@192.168.1.25
+ssh pi@192.168.1.30 mkdir -p .ssh
+cat ~/.ssh/id_rsa.pub | ssh pi@192.168.1.30 'cat >> .ssh/authorized_keys'
+ssh pi@192.168.1.30 "chmod 700 .ssh; chmod 640 .ssh/authorized_keys"
+ssh pi@192.168.1.30
 
 rsync -avzP --delete pi@192.168.1.12:/home/pi/Desktop/pyUI/profiles/ /home/pi/Desktop/pyui/profiles/
 
@@ -145,6 +145,6 @@ wget https://project-downloads.drogon.net/wiringpi-latest.deb
 sudo dpkg -i wiringpi-latest.deb
 
 
-#
+#Ubuntu access tty deny
 sudo usermod -a -G tty qa
 sudo chown qa /dev/ttyUSB0

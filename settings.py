@@ -54,10 +54,12 @@ class Settings(QDialog):
                 self.listWidget.addItem(name)
 
     def runsyncprofiles(self):
-        cmd = 'rsync -avz -e ssh {1}/ pi@{0}:{1}/'.format(myconstdef.IP_LEFT, self.data["profilepath"])
-        os.system(cmd)
-        cmd = 'rsync -avz -e ssh {1}/ pi@{0}:{1}/'.format(myconstdef.IP_RIGHT, self.data["profilepath"])
-        os.system(cmd)
+        if self.leftProxy != None:
+            cmd = 'rsync -avz -e ssh {1}/ pi@{0}:{1}/'.format(myconstdef.IP_LEFT, self.data["profilepath"])
+            os.system(cmd)
+        if self.rightProxy != None:
+            cmd = 'rsync -avz -e ssh {1}/ pi@{0}:{1}/'.format(myconstdef.IP_RIGHT, self.data["profilepath"])
+            os.system(cmd)
 
     @pyqtSlot()
     def On_Import(self):
@@ -75,9 +77,11 @@ class Settings(QDialog):
     def On_Delete(self):
         if self.listWidget.currentRow()>=0:     
             proname = self.listWidget.currentItem().text()
-            self.logger.info("delete:"+proname)            
-            self.leftProxy.RemoveProfile(proname)
-            self.rightProxy.RemoveProfile(proname)
+            self.logger.info("delete:"+proname)   
+            if self.leftProxy != None:         
+                self.leftProxy.RemoveProfile(proname)
+            if self.rightProxy != None:
+                self.rightProxy.RemoveProfile(proname)
             dirPath=os.path.join(self.data["profilepath"], proname)
             try:
                 shutil.rmtree(dirPath)
@@ -89,11 +93,15 @@ class Settings(QDialog):
     
     @pyqtSlot()
     def On_Rename(self):
-        newname="aaaa"
+        newname, okPressed = QInputDialog.getText(self, "Profile Name","New profile Name:", QLineEdit.Normal, "")
+        if okPressed or text == '':
+            return
         if self.listWidget.currentRow()>=0:    
             proname = self.listWidget.currentItem().text()     
-            self.leftProxy.RenameProfile(proname, newname)
-            self.rightProxy.RenameProfile(proname, newname)
+            if self.leftProxy != None:         
+                self.leftProxy.RenameProfile(proname, newname)
+            if self.rightProxy != None:
+                self.rightProxy.RenameProfile(proname, newname)
             dirPath=os.path.join(self.data["profilepath"], proname)
             dirPath1=os.path.join(self.data["profilepath"], newname)
             try:
