@@ -5,5 +5,8 @@
     <file>icons/yes.png</file>
     <file>icons/no.png</file>
     <file>icons/warning.png</file>
+    <file>icons/psi.png</file>
+    <file>icons/setting.png</file>
+    <file>icons/close.png</file>
 </qresource>
 </RCC>

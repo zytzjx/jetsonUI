@@ -40,7 +40,7 @@ class RequestHandler():#pyjsonrpc.HttpRequestHandler):
         self.logger = logging.getLogger('PSILOG')
         self.imageresults=[[],[],[]]
         self.profilename=""
-        self.rootprofielpath=""
+        self.rootprofielpath=os.path.join(os.path.dirname(os.path.realpath(__file__)),"profiles")
         self._profilepath=""
         self.screwW = myconstdef.screwWidth
         self.screwH = myconstdef.screwHeight
@@ -64,6 +64,8 @@ class RequestHandler():#pyjsonrpc.HttpRequestHandler):
         self.screwW = w
         self.screwH = h
 
+    def getProfileRootPath(self):
+        return self.rootprofielpath
 
     def setConfig(self, sconfig):
         if not (sconfig is None or sconfig==""):
@@ -92,7 +94,12 @@ class RequestHandler():#pyjsonrpc.HttpRequestHandler):
             stream = io.BytesIO()
             with picamera.PiCamera() as camera:
                 camera.ISO = 50
-                camera.resolution=(640,480)
+                camera.resolution=(720,580)
+                #camera.resolution=(480,640)
+                camera.vflip = True
+                camera.hflip = True
+
+                #camera.rotation = 90
                 #camera.start_preview()
                 #time.sleep(2)
                 for foo in camera.capture_continuous(stream, 'jpeg', use_video_port=True):
@@ -195,6 +202,7 @@ class RequestHandler():#pyjsonrpc.HttpRequestHandler):
         smplfilename=os.path.join(self._profilepath, self._DirSub(index), self.profilename+".jpg")
         self.logger.info(txtfilename)
         self.logger.info(smplfilename)
+        self.imageresults[index] = []
         if os.path.exists(txtfilename) and os.path.exists(smplfilename):
             self.lockyan.acquire()
             self.logger.info("*testScrews**")
@@ -275,6 +283,43 @@ class RequestHandler():#pyjsonrpc.HttpRequestHandler):
             self._imagepixmapback = Image.open(filename)#QPixmap(filename)
         self._savescrew(index, QPoint(x,y))
 
+    def _savescrewRect(self, index, rect):
+        x = rect.topLeft().x()
+        y = rect.topLeft().y()
+        x1 = rect.bottomRight().x()
+        y1 = rect.bottomRight().y()
+        
+        #currentQRect = QRect(QPoint(x,y),QPoint(x1,y1))
+        cropQPixmap = self._imagepixmapback.crop((x,y,x1,y1))#.copy(currentQRect)
+        profilepath=self._profilepath
+        filename = self._fileprechar(index)+str(self._indexscrew)+".png" 
+        profilepath=os.path.join(profilepath, self._DirSub(index), filename)
+        self._indexscrew+=1
+        cropQPixmap.save(profilepath)
+        rect = QRect(QPoint(x,y), QPoint(x1,y1))
+        screwpoint = profiledata.screw(self.profilename, filename, rect.center(), QPoint(x,y), QPoint(x1,y1))
+        #self.ProfilePoint.append(screwpoint)
+        sinfo = profilepath+", "+str(x)+", "+str(x1)+", "+str(y)+", "+str(y1)
+        profiletxt = os.path.join(self._profilepath, self._DirSub(index),  self.profilename+".txt")
+        self._append_new_line(profiletxt, sinfo)
+
+
+    def SaveProfile(self, index, rects):
+        if self._imagepixmapback == None or index != self._curIndex:
+            filename = "/tmp/ramdisk/phoneimage_%d.jpg" % index
+            self._imagepixmapback = Image.open(filename)#QPixmap(filename)
+            profiletxt = os.path.join(self._profilepath, self._DirSub(index),  self.profilename+".txt")
+            if os.path.exists(profiletxt):
+                os.remove(profiletxt)
+            shutil.copyfile("/tmp/ramdisk/phoneimage_%d.jpg" % index, os.path.join(self._profilepath, self._DirSub(index), self.profilename+".jpg"))
+
+        self.logger.info("SaveProfile + ")    
+        self.logger.info(rects)
+        self._indexscrew = 0
+        for rr in rects:
+            rect = QRect(QPoint(rr[0], rr[1]), QPoint(rr[2], rr[3]))
+            self._savescrewRect(index, rect)
+
     def updateProfile(self, ppath):
         if not ppath or ppath=="":
             curpath=os.path.abspath(os.path.dirname(sys.argv[0]))
@@ -297,14 +342,18 @@ class RequestHandler():#pyjsonrpc.HttpRequestHandler):
         return xmlrpc.client.Binary(handle.read())
     
     def capture(self, cam, IsDetect=True):
-        cmd = "raspistill -vf -hf -ISO 50 -n -t 50 -o /tmp/ramdisk/phoneimage_%d.jpg" % cam
-        if cam ==0:
-            cmd = "raspistill -ISO 50 -n -t 50 -o /tmp/ramdisk/phoneimage_%d.jpg" % cam
+        cmd = "raspistill -w 2464 -h 3280 -rot 270 -vf -hf -ISO 50 -n -t 50 -o /tmp/ramdisk/phoneimage_%d.jpg" % cam
+        #if cam ==0:
+        #    cmd = "raspistill -ISO 50 -n -t 50 -o /tmp/ramdisk/rawimage_%d.jpg" % cam
         os.system(cmd)
+        #im = Image.open("/tmp/ramdisk/rawimage_%d.jpg" % cam)
+        #rotate image by 90 degrees
+        #angle = 90
+        #out = im.rotate(angle, expand=True)
+        #out.save("/tmp/ramdisk/phoneimage_%d.jpg" % cam)
         if not IsDetect:
             shutil.copyfile("/tmp/ramdisk/phoneimage_%d.jpg" % cam, os.path.join(self._profilepath, self._DirSub(cam), self.profilename+".jpg"))
         else:
-            #self._startdetectthread(cam)
             self._callyanfunction(cam)
 
     #@pyjsonrpc.rpcmethod

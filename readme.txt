@@ -10,6 +10,15 @@ export DISPLAY=:0
 #X -nocursor -s 0 -dpms &
 /home/pi/Desktop/pyUI/start.sh &
 
+sudo nano ~/.config/lxsession/LXDE-pi/autostart
+@lxpanel --profile LXDE
+@pcmanfm --desktop --profile LXDE
+@xscreensaver -no-splash
+@/home/pi/Desktop/pyUI/start.sh
+
+
+
+
 sudo apt install python3-opencv
 
 
@@ -88,11 +97,6 @@ sudo apt install xscreensaver
 #pip3 install scp
 pip3 install paramiko
 
-[ubuntu]
-   sudo apt-get install python3-matplotlib python3-numpy python3-pil python3-scipy python3-tk
-   sudo apt-get install build-essential cython3
-
-   
 pip3 install scikit-image
 pip3 install scipy
 

@@ -1,6 +1,8 @@
 screwWidth = 40
 screwHeight = 40
 
+DEFAULTCONFIG={"cw":3280,"ch":2464,"profilepath":"/home/pi/Desktop/pyUI/profiles"}
+
 IP='192.168.1.12'
 URL='http://%s:8888' % IP
 
