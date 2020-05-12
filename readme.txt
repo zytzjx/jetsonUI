@@ -152,3 +152,6 @@ sudo dpkg -i wiringpi-latest.deb
 #Ubuntu access tty deny
 sudo usermod -a -G tty qa
 sudo chown qa /dev/ttyUSB0
+
+
+https://learn.adafruit.com/turning-your-raspberry-pi-zero-into-a-usb-gadget/ethernet-gadget

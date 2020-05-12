@@ -62,7 +62,7 @@ class FDProtocol(serial.threaded.LineReader):
         """
         m = re.search(r'^(.*?):[ ]?(\d+)$', line)
         #self.logger.info(line)
-        #print(line)
+        print(line)
         if m:
             if m.group(1) =="Proximity":
                 if int(m.group(2)) < self.proximityThreshold:
