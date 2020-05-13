@@ -10,6 +10,8 @@ import time
 from http.server import BaseHTTPRequestHandler
 from urllib import parse
 
+from datetime import datetime
+
 class GetHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
@@ -40,17 +42,20 @@ class GetHandler(BaseHTTPRequestHandler):
         message_parts.append('')
         message = '\r\n'.join(message_parts)
         '''
+        print("recv: start take: "+datetime.now())
         imagename = '/tmp/ramdisk/phoneimage.jpg'
         cmd = "raspistill -w 2464 -h 3280 -rot 270 -vf -hf -ISO 50 -n -t 50 -o %s" %imagename
         os.system(cmd)
-        time.sleep(0.1)
+        print("end take: "+datetime.now())
 
         self.send_response(200)
         self.send_header('Content-Type',
                          'image/jpg')
         self.end_headers()
+        print("end header: "+datetime.now())
         with open(imagename, 'rb') as file:
             self.wfile.write(file.read())
+        print("end get finish: "+datetime.now())
 
 if __name__ == '__main__':
     from http.server import HTTPServer
