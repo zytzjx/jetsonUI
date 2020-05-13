@@ -52,7 +52,7 @@ class GetHandler(BaseHTTPRequestHandler):
 
 if __name__ == '__main__':
     from http.server import HTTPServer
-    server = HTTPServer(('localhost', 8080), GetHandler)
+    server = HTTPServer(('0.0.0.0', 8080), GetHandler)
     print('Starting server, use <Ctrl-C> to stop')
     server.serve_forever()
 
