@@ -1,10 +1,11 @@
 # _*_ coding:utf-8 _*_
 
-from xmlrpc.server import SimpleXMLRPCServer
-from socketserver import ThreadingMixIn
-import xmlrpc.client
+#from xmlrpc.server import SimpleXMLRPCServer
+#from socketserver import ThreadingMixIn
+#import xmlrpc.client
 import os
 import logging
+import time
 
 from http.server import BaseHTTPRequestHandler
 from urllib import parse
@@ -42,6 +43,7 @@ class GetHandler(BaseHTTPRequestHandler):
         imagename = '/tmp/ramdisk/phoneimage.jpg'
         cmd = "raspistill -w 2464 -h 3280 -rot 270 -vf -hf -ISO 50 -n -t 50 -o %s" %imagename
         os.system(cmd)
+        time.sleep(0.1)
 
         self.send_response(200)
         self.send_header('Content-Type',
