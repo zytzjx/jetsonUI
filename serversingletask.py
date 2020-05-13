@@ -42,20 +42,24 @@ class GetHandler(BaseHTTPRequestHandler):
         message_parts.append('')
         message = '\r\n'.join(message_parts)
         '''
-        print("recv: start take: "+datetime.now())
+        print("recv: start take: ")
+        print(datetime.now())
         imagename = '/tmp/ramdisk/phoneimage.jpg'
         cmd = "raspistill -w 2464 -h 3280 -rot 270 -vf -hf -ISO 50 -n -t 50 -o %s" %imagename
         os.system(cmd)
-        print("end take: "+datetime.now())
+        print("end take: ") 
+        print(datetime.now())
 
         self.send_response(200)
         self.send_header('Content-Type',
                          'image/jpg')
         self.end_headers()
-        print("end header: "+datetime.now())
+        print("end header: ") 
+        print(datetime.now())
         with open(imagename, 'rb') as file:
             self.wfile.write(file.read())
-        print("end get finish: "+datetime.now())
+        print("end get finish: ") 
+        print(datetime.now())
 
 if __name__ == '__main__':
     from http.server import HTTPServer
