@@ -155,3 +155,29 @@ sudo chown qa /dev/ttyUSB0
 
 
 https://learn.adafruit.com/turning-your-raspberry-pi-zero-into-a-usb-gadget/ethernet-gadget
+https://idea.isnew.info/how-to-connect-to-the-internet-over-usb-from-the-raspberry-pi-zero.html
+
+https://ubuntu1804.blogspot.com/2019/08/jetson-nano-python3-install-scikit-image.html
+https://stackoverflow.com/questions/60448903/cannot-install-scikit-learn-on-jetson-nano
+
+sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
+sudo apt-get install build-essential cython3
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3 ./get-pip.py
+python3 -m pip install --upgrade cython
+python3 -m pip install --upgrade scikit-image
+
+sudo apt-get install python3-scipy
+pip3 install Pillow
+pip3 install pyserial
+sudo apt-get install python3-matplotlib python3-numpy python3-pil python3-scipy python3-tk
+sudo apt-get install build-essential cython3
+sudo pip3 install scikit-image
+pip3 install python3-pyqt5
+sudo pip3 install python3-pyqt5
+sudo apt install python3-pyqt5
+
+sudo apt-get install build-essential python3-dev cython3 python3-setuptools python3-pip python3-wheel python3-numpy python3-pytest python3-blosc python3-brotli python3-snappy python3-lz4 libz-dev libblosc-dev liblzma-dev liblz4-dev libzstd-dev libpng-dev libwebp-dev libbz2-dev libopenjp2-7-dev libjpeg-turbo8-dev libjxr-dev liblcms2-dev libcharls-dev libaec-dev libbrotli-dev libsnappy-dev libzopfli-dev libgif-dev libtiff-dev
+pip install imagecodecs==2019.5.22
+pip install scikit-image==0.16.2
+

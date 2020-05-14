@@ -122,16 +122,37 @@ class CSI_Camera:
 
     # Currently there are setting frame rate on CSI Camera on Nano through gstreamer
     # Here we directly select sensor_mode 8 (3840x2160, 59.9999 fps) 5) : 2104x1560
+    #gstreamer_pipeline(flip_method=0, capture_height=2464, capture_width=3280, framerate=10, display_height=2464, display_width=3280)
     def gstreamer_pipeline(self,
         sensor_id=0,
-        sensor_mode=3,
-        capture_width=3840,
-        capture_height=2160,
-        display_width=1280,
-        display_height=720,
+        capture_width=3280,
+        capture_height=2464,
+        display_width=3280,
+        display_height=2464,
         framerate=10,
         flip_method=0,
     ):
+        return (
+            "nvarguscamerasrc sensor-id=%d sensor-mode=4  wbmode=1 ! "
+            "video/x-raw(memory:NVMM), "
+            "width=(int)%d, height=(int)%d, "
+            "format=(string)NV12, framerate=(fraction)%d/1 ! "
+            "nvvidconv flip-method=%d ! "
+            "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
+            "videoconvert ! "
+            "video/x-raw, format=(string)BGR ! appsink"
+            % (
+                sensor_id,
+                capture_width,
+                capture_height,
+                framerate,
+                flip_method,
+                display_width,
+                display_height,
+            )
+        )
+
+        '''
         return(
             "nvarguscamerasrc sensor-id=%d ! "
             "video/x-raw(memory:NVMM), "
@@ -151,7 +172,7 @@ class CSI_Camera:
             )
         )
 
-        '''
+        
         return (
             "nvarguscamerasrc sensor-id=%d sensor-mode=%d ! "
             "video/x-raw(memory:NVMM), "

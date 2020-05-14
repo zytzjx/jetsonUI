@@ -35,8 +35,8 @@ import cv2
 
 from  serialstatus import FDProtocol
 import serial
-from xmlrpc.client import ServerProxy
-import xmlrpc.client
+#from xmlrpc.client import ServerProxy
+#import xmlrpc.client
 
 import subprocess
 import numpy as np
@@ -46,6 +46,9 @@ import myconstdef
 import resource
 from CSICamera import CSI_Camera
 import dlgResult
+
+import urllib.request
+
 
 files = []
 
@@ -58,30 +61,6 @@ def listImages(path):
         for file in f:
             if file.lower().endswith(('.png', '.jpg', '.jpeg')):
                 files.append(os.path.join(r, file))
-
-class DrawPicThread(QThread):
-    #signal = pyqtSignal('PyQt_PyObject')
-    def __init__(self, imagelabel, index):
-        QThread.__init__(self)
-        self.imagelabel=imagelabel
-        self.index = index
-
-    def run(self):
-        import testrsync
-        self.logger.info(datetime.now().strftime("%H:%M:%S.%f")+"   call rsync++")
-        #process = subprocess.Popen(["rsync", "-avzP", '--delete', '/tmp/ramdisk', "pi@192.168.1.16:/tmp/ramdisk"],
-        #    stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        #process.stdin.write(b'qa\n')
-        #process.communicate()[0]
-        #process.wait()
-        testrsync.rsync()
-        self.logger.info(datetime.now().strftime("%H:%M:%S.%f")+"   call rsync--")
-        #process.stdin.close()
-        self.imagelabel.imagepixmap = QPixmap("/tmp/ramdisk/phoneimage_%d.jpg" % self.index)#pixmap
-
-        #status = self.imagelabel.DrawImageResults(self.data)
-        #self.signal.emit((self.index, status))
-
 
 class StatusCheckThread(QThread):
 #https://kushaldas.in/posts/pyqt5-thread-example.html
@@ -112,13 +91,16 @@ class StatusCheckThread(QThread):
                     if status!=1:
                         status=1
                         #do task start
-                elif not statusser.proximityStatus:
+                elif  statusser.laserStatus and not statusser.proximityStatus:
+                    if status != 3:# ready
+                        status = 3    
+                elif not statusser.proximityStatus and not statusser.laserStatus:
+                    if status != 3: 
+                        continue
                     if status!=2:
                         status=2
-                        #start preview
-                elif not statusser.laserStatus:
-                    if status != 3:
-                        status = 3
+                        #start preview         
+                        #        
                 if not self.mylock.locked():
                     if oldstatus != status:
                         self.signal.emit(status)
@@ -197,7 +179,7 @@ class UISettings(QDialog):
         self.imageRight.SetCamera(PhotoViewer.CAMERA.RIGHT)
 
         self.startKey =False
-        self.clientleft = ServerProxy(myconstdef.URL_LEFT, allow_none=True)
+        #self.clientleft = ServerProxy(myconstdef.URL_LEFT, allow_none=True)
         #self.clienttop = ServerProxy(myconstdef.URL_TOP, allow_none=True)
         #self.clientright = ServerProxy(myconstdef.URL_RIGHT, allow_none=True)
         self.setStyleSheet('''
@@ -245,7 +227,7 @@ class UISettings(QDialog):
         self.threadDryrun = None
         #self.imageResults=[0]*3
         self.profileimages = ["", "", ""]
-        self.imageresults = []
+        self.imageresults = [[],[],[]]
         self.yanthread = None
         self._profilepath = ""  #with profile name
         self.profilename = ""
@@ -402,17 +384,17 @@ class UISettings(QDialog):
     def createprofiledirstruct(self, profiename):
         self.clientA.startCamera(0)
         self.clientB.startCamera(1)
-        self.clientleft = ServerProxy(myconstdef.URL_LEFT, allow_none=True)
+        #self.clientleft = ServerProxy(myconstdef.URL_LEFT, allow_none=True)
         #self.clienttop = ServerProxy(myconstdef.URL_TOP, allow_none=True)
         #self.clientright = ServerProxy(myconstdef.URL_RIGHT, allow_none=True)
-        self.imageLeft.setServerProxy(self.clientleft)
+        #self.imageLeft.setServerProxy(self.clientleft)
         #self.imageTop.setServerProxy(self.clienttop)
         #self.imageRight.setServerProxy(self.clientright)
 
     def closeEvent(self, event):
         self._stopPreview()
         self._saveConfigFile()
-        self._shutdown()
+        #self._shutdown()
         self.serialThread.exit_event.set()
         self.close()
 
@@ -426,10 +408,9 @@ class UISettings(QDialog):
     def _GetImageShow(self):
         self.logger.info("preview: thread starting...")
         
-        #if self.isProfilestatus:
-            #return
         self.imageTop.setImageScale()
         self.imageTop.toggleReviewMode(True)
+        self.previewpixEvent.set()
         self.stop_prv.clear()
         while True:
             _ , data=self.clientA.read()
@@ -444,8 +425,7 @@ class UISettings(QDialog):
                 break
 
         self.stop_prv.clear()
-        if self.isProfilestatus:
-            self.previewpixEvent.set()
+        self.previewpixEvent.clear()
         self.logger.info("preview: thread ending...")
 
 
@@ -573,8 +553,6 @@ class UISettings(QDialog):
         if self.listWidget.currentRow()>=0:     
             proname = self.listWidget.currentItem().text()
             self.logger.info("delete:"+proname)            
-            #self.clienttop.RemoveProfile(proname)
-            #self.clientright.RemoveProfile(proname)
             dirPath=os.path.join(self.data["profilepath"], proname)
             try:
                 shutil.rmtree(dirPath)
@@ -700,23 +678,21 @@ class UISettings(QDialog):
         os.system(cmd)
 
     def capture(self, cam, IsDetect=True):
-        #cmd = "raspistill -vf -hf -ISO 50 -n -t 50 -o /tmp/ramdisk/phoneimage_%d.jpg" % cam
-        #if cam ==0:
-        #    cmd = "raspistill -ISO 50 -n -t 50 -o /tmp/ramdisk/phoneimage_%d.jpg" % cam
-        #logging.info(cmd)
-        #os.system(cmd)
-        client = self.clientA if cam==0 else self.clientB
-        _ , data=client.read()
-        img = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
-        image = Image.fromarray(img)
-        image.save("/tmp/ramdisk/phoneimage_%d.jpg" % cam)
+        if cam == PhotoViewer.CAMERA.RIGHT.value:
+            urllib.request.urlretrieve(myconstdef.URL_RIGHT, '/tmp/ramdisk/phoneimage_%d.jpg' % cam)
+        else:
+            client = self.clientA if cam==0 else self.clientB
+            _ , data=client.read()
+            img = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
+            image = Image.fromarray(img)
+            image.save("/tmp/ramdisk/phoneimage_%d.jpg" % cam)
+
         if not IsDetect:
             shutil.copyfile("/tmp/ramdisk/phoneimage_%d.jpg" % cam, os.path.join(self._profilepath, self._DirSub(cam), self.profilename+".jpg"))
         else:
             self._callyanfunction(cam)
 
     def _callyanfunction(self, index):
-        #self.profilename= self.leProfile.text() if self.checkBox.isChecked() else self.comboBox.currentText()
         self.logger.info('callyanfunction:' + self.profilename)
         txtfilename=os.path.join(self._profilepath, self._DirSub(index), self.profilename+".txt")
         smplfilename=os.path.join(self._profilepath, self._DirSub(index), self.profilename+".jpg")
@@ -725,60 +701,31 @@ class UISettings(QDialog):
         if os.path.exists(txtfilename) and os.path.exists(smplfilename):
             self.logger.info("*testScrews**")
             try:
-                self.imageresults = testScrew.testScrews(
+                self.imageresults[index] = testScrew.testScrews(
                     txtfilename, 
                     smplfilename, 
                     "/tmp/ramdisk/phoneimage_%d.jpg" % index)
             except :
-                self.imageresults = []
+                self.imageresults[index] = []
                 pass
             
             self.logger.info("-testScrews end--")
-            self.logger.info(self.imageresults)
-
-    def _startdetectthread(self, index):
-        self.yanthread = Process(target=self._callyanfunction, args=(index,))
-        self.yanthread.start()
-        self.yanthread.join()
+            self.logger.info(self.imageresults[index])
 
     def _showImage(self, index, imagelabel):
         imagelabel.setImageScale()     
         self.logger.info("Start testing %d" % index)
-        if index==ImageLabel.CAMERA.LEFT.value:
-            self.clientleft.TakePicture(index, not self.checkBox.isChecked()) 
-        else: 
-            self.capture(index, not self.checkBox.isChecked())
+ 
+        self.capture(index, not self.isProfilestatus)
 
         self.logger.info("Start transfer %d" % index)
         imagelabel.SetProfile(self.profilename, self.profilename+".jpg")
         if self.isProfilestatus:
-            if index!=PhotoViewer.CAMERA.LEFT.value:
-                self.imageview.emit(QPixmap("/tmp/ramdisk/phoneimage_%d.jpg" % index), index)
-                #imagelabel.ShowPreImage(QPixmap("/tmp/ramdisk/phoneimage_%d.jpg" % index))#pixmap
-            else:
-                #data = self.clientleft.imageDownload(index).data if index == 1 else self.clientright.imageDownload(index).data
-                data = self.clientleft.imageDownload(index).data
-                self.logger.info("end testing %d" % index)
-                image = Image.open(io.BytesIO(data))
-                image.save("/tmp/ramdisk/temp_%d.jpg" % index)
-                #imageq = ImageQt(image) #convert PIL image to a PIL.ImageQt object
-                #pixmap = QPixmap.fromImage(imageq)
-                #imagelabel.ShowPreImage(QPixmap("/tmp/ramdisk/temp_%d.jpg" % index))#pixmap
-                self.imageview.emit(QPixmap("/tmp/ramdisk/temp_%d.jpg" % index), index)
-                #self.imageview.emit(pixmap)
-        else:
-            #imagelabel.SetProfile(self.profilename, self.profilename+".jpg")
-            if index==PhotoViewer.CAMERA.LEFT.value:
-                pass
+            self.imageview.emit(QPixmap("/tmp/ramdisk/phoneimage_%d.jpg" % index), index)
 
     def _drawtestScrew(self, index, imagelabel):
         ret=0
-        if index!=PhotoViewer.CAMERA.LEFT.value:
-            ret = imagelabel.DrawImageResults(self.imageresults)
-        else:
-            ss = self.clientleft.ResultTest(index)
-            #ss = self.clienttop.ResultTest(index) if index==1 else self.clientright.ResultTest(index)
-            ret = imagelabel.DrawImageResults(json.loads(ss))
+        ret = imagelabel.DrawImageResults(self.imageresults[index])
         return ret
 
     def _ThreadTakepictureLeft(self):
@@ -786,8 +733,6 @@ class UISettings(QDialog):
             self._showImage(PhotoViewer.CAMERA.LEFT.value, self.imageLeft)
         except Exception as ex:
             self.logger.exception(str(ex))
-            status = 5
-
         self.logger.info("ending camera Left and transfer")
 
     def _ThreadTakepictureRight(self):
@@ -795,8 +740,6 @@ class UISettings(QDialog):
             self._showImage(PhotoViewer.CAMERA.RIGHT.value, self.imageRight)
         except Exception as ex:
             self.logger.exception(str(ex))
-            status = 5
-
         self.logger.info("ending camera right and transfer")
 
 
@@ -806,34 +749,24 @@ class UISettings(QDialog):
             self._showImage(PhotoViewer.CAMERA.TOP.value, self.imageTop)
         except Exception as ex:
             self.logger.exception(str(ex))
-            status = 5
-
         self.logger.info("ending camera A and transfer")
 
     def DrawResultTop(self):
-        #self.lblImageTop.clear()
         self.ClearImageShow.emit(0x1)
         self.imageTop.imagedresult = 0
-		self.imageLeft.DrawImageResults(self.imageresults, self.ProfileImages[PhotoViewer.CAMERA.TOP.value].copy(self.ProfileImages[PhotoViewer.CAMERA.TOP.value].rect()))
-
-        #data = json.loads(self.clienttop.ResultTest(PhotoViewer.CAMERA.TOP.value))
-        #if len(data)>0:
-        #    status1 = self.imageTop.DrawImageResults(data, self.ProfileImages[PhotoViewer.CAMERA.TOP.value].copy(self.ProfileImages[PhotoViewer.CAMERA.TOP.value].rect()))
+        self.imageLeft.DrawImageResults(self.imageresults[PhotoViewer.CAMERA.TOP.value], self.ProfileImages[PhotoViewer.CAMERA.TOP.value].copy(self.ProfileImages[PhotoViewer.CAMERA.TOP.value].rect()))
 
     def DrawResultLeft(self):
         #self.lblImageLeft.clear()
         self.ClearImageShow.emit(0x2)
         self.imageLeft.imagedresult = 0
-        self.imageLeft.DrawImageResults(self.imageresults, self.ProfileImages[PhotoViewer.CAMERA.LEFT.value].copy(self.ProfileImages[PhotoViewer.CAMERA.LEFT.value].rect()))
+        self.imageLeft.DrawImageResults(self.imageresults[PhotoViewer.CAMERA.LEFT.value], self.ProfileImages[PhotoViewer.CAMERA.LEFT.value].copy(self.ProfileImages[PhotoViewer.CAMERA.LEFT.value].rect()))
 
     def DrawResultRight(self):
         #self.lblImageRight.clear()
         self.ClearImageShow.emit(0x4)
         self.imageRight.imagedresult = 0
-		self.imageRight.DrawImageResults(self.imageresults, self.ProfileImages[PhotoViewer.CAMERA.RIGHT.value].copy(self.ProfileImages[PhotoViewer.CAMERA.RIGHT.value].rect()))
-        #data = json.loads(self.clientright.ResultTest(PhotoViewer.CAMERA.RIGHT.value))
-        #if len(data)>0:
-        #    status2 = self.imageRight.DrawImageResults(data, self.ProfileImages[PhotoViewer.CAMERA.RIGHT.value].copy(self.ProfileImages[PhotoViewer.CAMERA.RIGHT.value].rect()))
+        self.imageRight.DrawImageResults(self.imageresults[PhotoViewer.CAMERA.RIGHT.value], self.ProfileImages[PhotoViewer.CAMERA.RIGHT.value].copy(self.ProfileImages[PhotoViewer.CAMERA.RIGHT.value].rect()))
 
     def _loadProfile(self):
         self.imageTop.DrawProfile(self.profilename)
@@ -900,11 +833,6 @@ class UISettings(QDialog):
 
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            try:
-                self.clientleft.profilepath(self.sProfilePath, self.profilename)        
-            except:
-                pass
-            
             #try:
             #    self.clienttop.profilepath(self.sProfilePath, self.profilename)
             #except:
@@ -987,15 +915,6 @@ class UISettings(QDialog):
             QApplication.restoreOverrideCursor() 
 
 
-
-    def _shutdown(self):
-        try:
-            #self.clienttop.CloseServer()
-            #self.clientright.CloseServer()
-			self.clientleft.CloseServer()
-        except :
-            pass
-
     def ChangeTab(self):
         time.sleep(0.1)
         window.tabImages.setCurrentIndex(0)
@@ -1069,12 +988,6 @@ class UISettings(QDialog):
         self.imageTop.InitProfile()
         self.imageLeft.InitProfile()
         self.imageRight.InitProfile()
-        try:
-            #self.clienttop.cleanprofileparam()
-            #self.clientright.cleanprofileparam()
-			self.clientleft.cleanprofileparam()
-        except Exception as e:
-            self.logger.exception(str(e))
 
 
     def On_ProfileTakePic(self):
@@ -1117,11 +1030,6 @@ class UISettings(QDialog):
 
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            try:
-                self.clientleft.profilepath(self.sProfilePath, profilename)        
-            except:
-                pass
-            
             #try:
             #    self.clienttop.profilepath(self.sProfilePath, profilename)
             #except:
