@@ -125,10 +125,10 @@ class CSI_Camera:
     #gstreamer_pipeline(flip_method=0, capture_height=2464, capture_width=3280, framerate=10, display_height=2464, display_width=3280)
     def gstreamer_pipeline(self,
         sensor_id=0,
-        capture_width=3280,
-        capture_height=2464,
-        display_width=3280,
-        display_height=2464,
+        capture_width=2464,
+        capture_height=3280,
+        display_width=2464,
+        display_height=3280,
         framerate=10,
         flip_method=0,
     ):

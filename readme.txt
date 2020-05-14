@@ -181,3 +181,39 @@ sudo apt-get install build-essential python3-dev cython3 python3-setuptools pyth
 pip install imagecodecs==2019.5.22
 pip install scikit-image==0.16.2
 
+
+
+####################New install Jetson get standard installation process######
+## sudo no password
+## sudo visudo
+###  qa     ALL=(ALL) NOPASSWD:ALL
+
+
+sudo apt-get update && sudo apt-get upgrade
+sudo apt-get -y purge libreoffice*
+sudo apt-get -y clean
+sudo apt-get -y autoremove
+
+sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
+
+sudo apt-get -y install qt5-default pyqt5-dev pyqt5-dev-tools
+sudo apt-get -y install python3-matplotlib python3-numpy python3-pil python3-scipy python3-tk
+sudo apt-get -y install build-essential python3-dev cython3 python3-setuptools python3-pip python3-wheel python3-numpy python3-pytest \
+python3-blosc python3-brotli python3-snappy python3-lz4 libz-dev libblosc-dev liblzma-dev liblz4-dev libzstd-dev libpng-dev libwebp-dev \
+libbz2-dev libopenjp2-7-dev libjpeg-turbo8-dev libjxr-dev liblcms2-dev libcharls-dev libaec-dev libbrotli-dev libsnappy-dev libzopfli-dev libgif-dev libtiff-dev
+
+
+wget https://bootstrap.pypa.io/get-pip.py 
+python3 ./get-pip.py
+
+python3 -m pip install --upgrade pip
+python3 -m pip install --upgrade Pillow
+python3 -m pip install --upgrade pyserial
+python3 -m pip install imagecodecs==2019.5.22
+python3 -m pip install scikit-image==0.16.2
+python3 -m pip install dataclasses
+
+
+##low is zero
+sudo apt-get update
+sudo apt-get install avahi-daemon avahi-discover libnss-mdns

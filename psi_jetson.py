@@ -1,6 +1,7 @@
 #!/usr/bin/python3
+import fcntl
+import sys
 def lockFile(lockfile):
-    import fcntl
     fp = open(lockfile, 'w')
     try:
         fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -11,7 +12,6 @@ def lockFile(lockfile):
 if not lockFile(".lock.pid"):
     sys.exit(0)
 
-import sys
 import os
 import io
 import time
@@ -289,10 +289,11 @@ class UISettings(QDialog):
         return False
 
     def on_imei_editfinished(self):
-        if len(self.leIMEI.text())>=8:
-            _,model,_,_ = self.ImeiQuery(self.leIMEI.text())
-            self.leModel.setText(model)
-            self._getProfileName()
+        return
+        #if len(self.leIMEI.text())>=8:
+        #    _,model,_,_ = self.ImeiQuery(self.leIMEI.text())
+        #    self.leModel.setText(model)
+        #    self._getProfileName()
 
     def on_model_editfinished(self):
         self._getProfileName()        
@@ -372,6 +373,8 @@ class UISettings(QDialog):
         self.isPreview = self.config['preview'] if 'preview' in self.config else True
         self.isAutoDetect = self.config["autostart"] if 'autostart' in self.config else True
         self.cbAutoStart.setChecked(self.isAutoDetect)
+        self.pbStart.setEnabled(not self.isAutoDetect)
+        self.pbFinish.setEnabled(not self.isAutoDetect)
         spath = os.path.join(os.path.dirname(os.path.realpath(__file__)),"profiles")
         self.sProfilePath = self.config["profilepath"] if 'profilepath' in self.config else spath
         self.lblStationID.setText(self.config["stationid"] if 'stationid' in self.config else '1')
