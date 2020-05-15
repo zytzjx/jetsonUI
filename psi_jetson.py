@@ -398,6 +398,8 @@ class UISettings(QDialog):
         self._stopPreview()
         self._saveConfigFile()
         #self._shutdown()
+        self.clientA.close()
+        self.clientB.close()
         self.serialThread.exit_event.set()
         self.close()
 
@@ -416,8 +418,9 @@ class UISettings(QDialog):
         self.previewpixEvent.set()
         self.stop_prv.clear()
         while True:
-            _ , data=self.clientA.read()
+            _ , data =self.clientA.read()
             img = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
+            img=cv2.resize(img, (580,720))
             image = Image.fromarray(img)
             imageq = ImageQt(image) #convert PIL image to a PIL.ImageQt object
             pixmap = QPixmap.fromImage(imageq)
@@ -556,7 +559,7 @@ class UISettings(QDialog):
         if self.listWidget.currentRow()>=0:     
             proname = self.listWidget.currentItem().text()
             self.logger.info("delete:"+proname)            
-            dirPath=os.path.join(self.data["profilepath"], proname)
+            dirPath=os.path.join(self.sProfilePath, proname)
             try:
                 shutil.rmtree(dirPath)
             except Exception as e:
@@ -677,8 +680,8 @@ class UISettings(QDialog):
 
     def runsyncprofiles(self, isLeft):
         ip = myconstdef.IP_LEFT        
-        cmd = 'rsync -avz -e ssh pi@{0}:{1}/ {2}/'.format(ip, '/home/pi/Desktop/pyUI/profiles',self.config["profilepath"])
-        os.system(cmd)
+        #cmd = 'rsync -avz -e ssh pi@{0}:{1}/ {2}/'.format(ip, '/home/pi/Desktop/pyUI/profiles',self.config["profilepath"])
+        #os.system(cmd)
 
     def capture(self, cam, IsDetect=True):
         if cam == PhotoViewer.CAMERA.RIGHT.value:
@@ -1082,6 +1085,7 @@ if __name__ == "__main__":
         sys.exit(0)
     #%(threadName)s       %(thread)d
     #logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s - %(name)s[%(thread)d] - %(levelname)s - %(message)s')
+    os.system(os.path.join(os.path.dirname(os.path.realpath(__file__)),"zerousbssh.sh"))
     logger = CreateLog()
     app = QApplication(sys.argv)
     QApplication.processEvents()

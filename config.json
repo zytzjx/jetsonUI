@@ -1,11 +1,10 @@
 {
-    "cw": 3280,
-    "ch": 2464,
-    "profilepath": "/home/qa/Desktop/pyUI/profiles",
     "comboxindex": 0,
     "screww": 40,
     "screwh": 40,
     "threhold": 40000,
     "preview": true,
-    "autostart": true
+    "autostart": false,
+    "stationid": "1",
+    "phonemodel": "sam"
 }

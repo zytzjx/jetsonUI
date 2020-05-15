@@ -47,6 +47,7 @@ class CSI_Camera:
         self.read_thread = None
         self.read_lock = threading.Lock()
         self.running = False
+        #self.sourceImage = threading.Event()
 
     def startCamera(self, id):
         self.open(
@@ -130,7 +131,7 @@ class CSI_Camera:
         display_width=2464,
         display_height=3280,
         framerate=10,
-        flip_method=0,
+        flip_method=1,
     ):
         return (
             "nvarguscamerasrc sensor-id=%d sensor-mode=4  wbmode=1 ! "

@@ -194,7 +194,7 @@ sudo apt-get -y purge libreoffice*
 sudo apt-get -y clean
 sudo apt-get -y autoremove
 
-sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
+sudo apt-get -y install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
 
 sudo apt-get -y install qt5-default pyqt5-dev pyqt5-dev-tools
 sudo apt-get -y install python3-matplotlib python3-numpy python3-pil python3-scipy python3-tk
