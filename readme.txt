@@ -215,3 +215,4 @@ python3 -m pip install dataclasses
 ##low is zero
 sudo apt-get update
 sudo apt-get install avahi-daemon avahi-discover libnss-mdns
+

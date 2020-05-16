@@ -17,6 +17,9 @@ import cv2
 import threading
 import numpy as np
 import logging
+from PIL import Image
+from PIL.ImageQt import ImageQt
+from PyQt5.QtGui import QPixmap
 
 # gstreamer_pipeline returns a GStreamer pipeline for capturing from the CSI camera
 # Flip the image by setting the flip_method (most common values: 0 and 2)
@@ -47,9 +50,17 @@ class CSI_Camera:
         self.read_thread = None
         self.read_lock = threading.Lock()
         self.running = False
-        #self.sourceImage = threading.Event()
+        self.takepic = threading.Event()
+        self.sensor_id = 0
 
     def startCamera(self, id):
+        self.sensor_id = id
+        print(self.gstreamer_pipeline(
+                sensor_id=id,
+            ))
+        print(self.gstreamer_pipeline_2(
+                sensor_id=id,
+            ))
         self.open(
             self.gstreamer_pipeline(
                 sensor_id=id,
@@ -98,6 +109,13 @@ class CSI_Camera:
         while self.running:
             try:
                 grabbed, frame = self.video_capture.read()
+                #if not grabbed:
+                #    continue
+                if self.takepic.is_set():
+                    cv2.imwrite("/tmp/ramdisk/phoneimage_%d.jpg" % self.sensor_id, frame)
+                    print("save image to file")
+                    self.takepic.clear()
+
                 with self.read_lock:
                     self.grabbed=grabbed
                     self.frame=frame
@@ -109,7 +127,11 @@ class CSI_Camera:
 
     def read(self):
         with self.read_lock:
-            frame = self.frame.copy()
+            img=cv2.resize(self.frame, (580,720))
+            img1 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            image = Image.fromarray(img1)
+            imageq = ImageQt(image) #convert PIL image to a PIL.ImageQt object
+            frame = QPixmap.fromImage(imageq) #.scaledToHeight(720)
             grabbed=self.grabbed
         return grabbed, frame
 
@@ -126,6 +148,32 @@ class CSI_Camera:
     #gstreamer_pipeline(flip_method=0, capture_height=2464, capture_width=3280, framerate=10, display_height=2464, display_width=3280)
     def gstreamer_pipeline(self,
         sensor_id=0,
+        flip_method=1, 
+        capture_height=3280, 
+        capture_width=2464, 
+        framerate=10, 
+        display_height=3280, 
+        display_width=2464
+    ):
+        return (
+            "nvarguscamerasrc sensor-id=%d ! "
+            "video/x-raw(memory:NVMM), width=(int)%d, height=(int)%d, format=(string)NV12, framerate=(fraction)%d/1 ! "
+            "nvvidconv flip-method=%d ! "
+            "video/x-raw, width=(int)%d, height=(int)%d ! "
+            "videoconvert ! video/x-raw, format=(string)BGR ! appsink"
+            % (
+                sensor_id,
+                capture_width,
+                capture_height,
+                framerate,
+                flip_method,
+                display_width,
+                display_height,
+            )
+        )
+    
+    def gstreamer_pipeline_2(self,
+        sensor_id=0,
         capture_width=2464,
         capture_height=3280,
         display_width=2464,
@@ -134,14 +182,11 @@ class CSI_Camera:
         flip_method=1,
     ):
         return (
-            "nvarguscamerasrc sensor-id=%d sensor-mode=4  wbmode=1 ! "
-            "video/x-raw(memory:NVMM), "
-            "width=(int)%d, height=(int)%d, "
-            "format=(string)NV12, framerate=(fraction)%d/1 ! "
+            "nvarguscamerasrc sensor-id=%d ! "
+            "video/x-raw(memory:NVMM), width=(int)%d, height=(int)%d, format=(string)NV12, framerate=(fraction)%d/1 ! "
             "nvvidconv flip-method=%d ! "
-            "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
-            "videoconvert ! "
-            "video/x-raw, format=(string)BGR ! appsink"
+            "video/x-raw, width=(int)%d, height=(int)%d ! "
+            "videoconvert ! video/x-raw, format=(string)BGR ! appsink"
             % (
                 sensor_id,
                 capture_width,

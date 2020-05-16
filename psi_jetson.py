@@ -1,11 +1,15 @@
 #!/usr/bin/python3
-import fcntl
+import socket
 import sys
 def lockFile(lockfile):
-    fp = open(lockfile, 'w')
+    #fp = open(lockfile, 'w')
     try:
-        fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    except IOError:
+        #fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        global s
+        s = socket.socket()
+        host = socket.gethostname()
+        s.bind((host, 60123))
+    except :
         return False
     return True
 
@@ -418,12 +422,12 @@ class UISettings(QDialog):
         self.previewpixEvent.set()
         self.stop_prv.clear()
         while True:
-            _ , data =self.clientA.read()
-            img = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
-            img=cv2.resize(img, (580,720))
-            image = Image.fromarray(img)
-            imageq = ImageQt(image) #convert PIL image to a PIL.ImageQt object
-            pixmap = QPixmap.fromImage(imageq)
+            _ , pixmap =self.clientA.read()
+            #img = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
+            #img=cv2.resize(img, (580,720))
+            #image = Image.fromarray(img)
+            #imageq = ImageQt(image) #convert PIL image to a PIL.ImageQt object
+            #pixmap = QPixmap.fromImage(imageq)
             #self.imageTop.ShowPreImage(pixmap)
             self.imageview.emit(pixmap, PhotoViewer.CAMERA.TOP.value)
             if self.stop_prv.is_set():
@@ -688,10 +692,18 @@ class UISettings(QDialog):
             urllib.request.urlretrieve(myconstdef.URL_RIGHT, '/tmp/ramdisk/phoneimage_%d.jpg' % cam)
         else:
             client = self.clientA if cam==0 else self.clientB
-            _ , data=client.read()
-            img = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
-            image = Image.fromarray(img)
-            image.save("/tmp/ramdisk/phoneimage_%d.jpg" % cam)
+            #_ , data=client.read()
+            #img = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
+            #image = Image.fromarray(img)
+            #image.save("/tmp/ramdisk/phoneimage_%d.jpg" % cam)
+            client.takepic.set()
+            i = 0
+            while client.takepic.is_set():
+                time.sleep(0.05)
+                i+=1
+                if i > 30:
+                    self.logger.info('camera thread has some problem.')
+                    break
 
         if not IsDetect:
             shutil.copyfile("/tmp/ramdisk/phoneimage_%d.jpg" % cam, os.path.join(self._profilepath, self._DirSub(cam), self.profilename+".jpg"))
@@ -715,7 +727,7 @@ class UISettings(QDialog):
                 self.imageresults[index] = []
                 pass
             
-            self.logger.info("-testScrews end--")
+            self.logger.info("-testScrews end--"+str(index))
             self.logger.info(self.imageresults[index])
 
     def _showImage(self, index, imagelabel):
@@ -1081,8 +1093,6 @@ def CreateLog():
     return logger
 
 if __name__ == "__main__":
-    if not lockFile(".lock.pid"):
-        sys.exit(0)
     #%(threadName)s       %(thread)d
     #logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s - %(name)s[%(thread)d] - %(levelname)s - %(message)s')
     os.system(os.path.join(os.path.dirname(os.path.realpath(__file__)),"zerousbssh.sh"))
