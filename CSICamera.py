@@ -20,6 +20,7 @@ import logging
 from PIL import Image
 from PIL.ImageQt import ImageQt
 from PyQt5.QtGui import QPixmap
+from datetime import datetime
 
 # gstreamer_pipeline returns a GStreamer pipeline for capturing from the CSI camera
 # Flip the image by setting the flip_method (most common values: 0 and 2)
@@ -131,7 +132,10 @@ class CSI_Camera:
             img1 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             image = Image.fromarray(img1)
             imageq = ImageQt(image) #convert PIL image to a PIL.ImageQt object
+
+            #print("from: "+ datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
             frame = QPixmap.fromImage(imageq) #.scaledToHeight(720)
+            #print("end: "+ datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
             grabbed=self.grabbed
         return grabbed, frame
 
