@@ -340,7 +340,7 @@ class UISettings(QDialog):
 
     def createprofiledirstruct(self, profiename):
         self.clientA.startCamera(0)
-        self.clientB.startCamera(1)
+        #self.clientB.startCamera(1)
         #self.clientleft = ServerProxy(myconstdef.URL_LEFT, allow_none=True)
         #self.clienttop = ServerProxy(myconstdef.URL_TOP, allow_none=True)
         #self.clientright = ServerProxy(myconstdef.URL_RIGHT, allow_none=True)

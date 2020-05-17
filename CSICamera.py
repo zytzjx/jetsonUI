@@ -112,6 +112,8 @@ class CSI_Camera:
                 grabbed, frame = self.video_capture.read()
                 #if not grabbed:
                 #    continue
+                #cv2.imwrite("/tmp/ramdisk/ph_%s.jpg" % datetime.now().strftime('%Y%m%d%H%M%S.%f'), frame)
+                print("recv: " + datetime.now().strftime('%Y%m%d%H%M%S.%f'))
                 if self.takepic.is_set():
                     cv2.imwrite("/tmp/ramdisk/phoneimage_%d.jpg" % self.sensor_id, frame)
                     print("save image to file")
