@@ -421,6 +421,7 @@ class UISettings(QDialog):
         self.imageTop.toggleReviewMode(True)
         self.previewpixEvent.set()
         self.stop_prv.clear()
+        #self.clientA.SetPreviewMode(True)
         while True:
             _ , pixmap =self.clientA.read()
             #img = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
@@ -696,6 +697,7 @@ class UISettings(QDialog):
             #img = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
             #image = Image.fromarray(img)
             #image.save("/tmp/ramdisk/phoneimage_%d.jpg" % cam)
+            time.sleep(0.1)
             client.takepic.set()
             i = 0
             while client.takepic.is_set():

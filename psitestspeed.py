@@ -1032,7 +1032,7 @@ def CreateLog():
 
     formatter = logging.Formatter('%(asctime)s-%(levelname)s-%(funcName)s(%(lineno)d) %(message)s')
 
-    logFile = 'psi.log'
+    logFile = '/tmp/ramdisk/psi.log'
     handler = RotatingFileHandler(logFile, mode='a', maxBytes=1*1024*1024, 
                                     backupCount=500, encoding=None, delay=False)
     handler.setFormatter(formatter)

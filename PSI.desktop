@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=PSI Futuredial
+Comment=PSI
+Exec=python3 /home/qa/Desktop/jetsonUI/psi_jetson.py
+Type=Application
+Encoding=UTF-8
+Terminal=false
+Icon=web-browser.png
+Path=/home/qa/Desktop/jetsonUI
+GenericName=PSI Futuredial Detect
+StartupNotify=false

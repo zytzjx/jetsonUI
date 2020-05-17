@@ -63,7 +63,7 @@ class CSI_Camera:
                 sensor_id=id,
             ))
         self.open(
-            self.gstreamer_pipeline(
+            self.gstreamer_pipeline_3(
                 sensor_id=id,
             )
         )
@@ -110,18 +110,27 @@ class CSI_Camera:
         while self.running:
             try:
                 grabbed, frame = self.video_capture.read()
-                #if not grabbed:
-                #    continue
-                #cv2.imwrite("/tmp/ramdisk/ph_%s.jpg" % datetime.now().strftime('%Y%m%d%H%M%S.%f'), frame)
-                print("recv: " + datetime.now().strftime('%Y%m%d%H%M%S.%f'))
+                if not grabbed:
+                    continue
+                #img = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR_I420)
+                #img1 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                #cv2.imwrite("/tmp/ramdisk/ph_%s.jpg" % datetime.now().strftime('%Y%m%d%H%M%S.%f'), img1, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                #print("recv: " + datetime.now().strftime('%Y%m%d%H%M%S.%f'))
                 if self.takepic.is_set():
-                    cv2.imwrite("/tmp/ramdisk/phoneimage_%d.jpg" % self.sensor_id, frame)
+                    img = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR_I420)
+                    img1 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                    cv2.imwrite("/tmp/ramdisk/phoneimage_%d.jpg" % self.sensor_id, img1, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
                     print("save image to file")
                     self.takepic.clear()
-
-                with self.read_lock:
+                
+                if self.read_lock.acquire(False):
                     self.grabbed=grabbed
                     self.frame=frame
+                    self.read_lock.release()
+
+                # with self.read_lock:
+                #     self.grabbed=grabbed
+                #     self.frame=frame
             except RuntimeError:
                 print("Could not read image from camera")
         # FIX ME - stop and cleanup thread
@@ -129,16 +138,18 @@ class CSI_Camera:
         
 
     def read(self):
+        frame = None
         with self.read_lock:
-            img=cv2.resize(self.frame, (580,720))
-            img1 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            image = Image.fromarray(img1)
-            imageq = ImageQt(image) #convert PIL image to a PIL.ImageQt object
-
-            #print("from: "+ datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
-            frame = QPixmap.fromImage(imageq) #.scaledToHeight(720)
-            #print("end: "+ datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
-            grabbed=self.grabbed
+            frame=self.frame
+        img2 = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR_I420)
+        img=cv2.resize(img2, (580,720))
+        img1 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        image = Image.fromarray(img1)
+        imageq = ImageQt(image) #convert PIL image to a PIL.ImageQt object
+        #print("from: "+ datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+        frame = QPixmap.fromImage(imageq) #.scaledToHeight(720)
+        #print("end: "+ datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+        grabbed=self.grabbed
         return grabbed, frame
 
     def release(self):
@@ -193,6 +204,32 @@ class CSI_Camera:
             "nvvidconv flip-method=%d ! "
             "video/x-raw, width=(int)%d, height=(int)%d ! "
             "videoconvert ! video/x-raw, format=(string)BGR ! appsink"
+            % (
+                sensor_id,
+                capture_width,
+                capture_height,
+                framerate,
+                flip_method,
+                display_width,
+                display_height,
+            )
+        )
+
+    def gstreamer_pipeline_3(self,
+        sensor_id=0,
+        capture_width=2464,
+        capture_height=3280,
+        display_width=2464,
+        display_height=3280,
+        framerate=10,
+        flip_method=1,
+    ):
+        return (
+            "nvarguscamerasrc sensor-id=%d ! "
+            "video/x-raw(memory:NVMM), width=(int)%d, height=(int)%d, format=(string)NV12, framerate=(fraction)%d/1 ! "
+            "nvvidconv flip-method=%d ! "
+            "video/x-raw, width=(int)%d, height=(int)%d, format=(string)I420 ! "
+            "appsink"
             % (
                 sensor_id,
                 capture_width,
