@@ -56,10 +56,7 @@ class CSI_Camera:
 
     def startCamera(self, id):
         self.sensor_id = id
-        print(self.gstreamer_pipeline(
-                sensor_id=id,
-            ))
-        print(self.gstreamer_pipeline_2(
+        print(self.gstreamer_pipeline_3(
                 sensor_id=id,
             ))
         self.open(
@@ -112,14 +109,15 @@ class CSI_Camera:
                 grabbed, frame = self.video_capture.read()
                 if not grabbed:
                     continue
-                #img = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR_I420)
-                #img1 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
                 #cv2.imwrite("/tmp/ramdisk/ph_%s.jpg" % datetime.now().strftime('%Y%m%d%H%M%S.%f'), img1, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                #print("recv: " + datetime.now().strftime('%Y%m%d%H%M%S.%f'))
+                print("recv: " + datetime.now().strftime('%Y%m%d%H%M%S.%f'))
                 if self.takepic.is_set():
-                    img = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR_I420)
-                    img1 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                    cv2.imwrite("/tmp/ramdisk/phoneimage_%d.jpg" % self.sensor_id, img1, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                    img2 = cv2.cvtColor(frame, cv2.COLOR_YUV2BGRA_I420)
+                    img1 = cv2.cvtColor(img2, cv2.COLOR_BGRA2RGB)
+                    image = Image.fromarray(img1)
+                    image.save("/tmp/ramdisk/phoneimage_%d.jpg" % self.sensor_id)
+                    #cv2.imwrite("/tmp/ramdisk/phoneimage_%d.jpg" % self.sensor_id, frame, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
                     print("save image to file")
                     self.takepic.clear()
                 
@@ -141,16 +139,17 @@ class CSI_Camera:
         frame = None
         with self.read_lock:
             frame=self.frame
-        img2 = cv2.cvtColor(frame, cv2.COLOR_YUV2BGR_I420)
-        img=cv2.resize(img2, (580,720))
-        img1 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        image = Image.fromarray(img1)
+
+        img2 = cv2.cvtColor(frame, cv2.COLOR_YUV2BGRA_I420)
+        img = cv2.resize(img2, (580,720))
+        img1 = cv2.cvtColor(img, cv2.COLOR_BGRA2RGB)
+        image = Image.fromarray(img1)        #image = Image.fromarray(img)
         imageq = ImageQt(image) #convert PIL image to a PIL.ImageQt object
         #print("from: "+ datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
-        frame = QPixmap.fromImage(imageq) #.scaledToHeight(720)
+        pixmap = QPixmap.fromImage(imageq) #.scaledToHeight(720)
         #print("end: "+ datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
         grabbed=self.grabbed
-        return grabbed, frame
+        return grabbed, pixmap
 
     def release(self):
         if self.video_capture != None:
@@ -283,3 +282,28 @@ class CSI_Camera:
             )
         )
         '''
+    def gstreamer_pipeline_4(self,
+        sensor_id=0,
+        capture_width=2464,
+        capture_height=3264,
+        display_width=2464,
+        display_height=3264,
+        framerate=21,
+        flip_method=1,
+    ):
+        return (
+            "nvarguscamerasrc sensor-id=%d ! "
+            "video/x-raw(memory:NVMM), width=(int)%d, height=(int)%d, format=(string)NV12, framerate=(fraction)%d/1 ! "
+            "nvvidconv flip-method=%d ! "
+            "video/x-raw, width=(int)%d, height=(int)%d, format=(string)RGBA! "
+            "videoconvert ! video/x-raw, format=(string)BGR ! appsink"
+            % (
+                sensor_id,
+                capture_width,
+                capture_height,
+                framerate,
+                flip_method,
+                display_width,
+                display_height,
+            )
+        )

@@ -353,7 +353,7 @@ class UISettings(QDialog):
         self._saveConfigFile()
         #self._shutdown()
         self.clientA.close()
-        self.clientB.close()
+        #self.clientB.close()
         #self.serialThread.exit_event.set()
         self.close()
 
