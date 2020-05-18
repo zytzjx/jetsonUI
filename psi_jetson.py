@@ -423,13 +423,17 @@ class UISettings(QDialog):
         self.stop_prv.clear()
         #self.clientA.SetPreviewMode(True)
         while True:
-            _ , pixmap =self.clientA.read()
+            ret, pixmap =self.clientA.read()
             #img = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
             #img=cv2.resize(img, (580,720))
             #image = Image.fromarray(img)
             #imageq = ImageQt(image) #convert PIL image to a PIL.ImageQt object
             #pixmap = QPixmap.fromImage(imageq)
             #self.imageTop.ShowPreImage(pixmap)
+            if not ret or pixmap is None or pixmap.isNull():
+                time.sleep(0.05)
+                continue
+            
             self.imageview.emit(pixmap, PhotoViewer.CAMERA.TOP.value)
             if self.stop_prv.is_set():
                 self.stop_prv.clear()
