@@ -477,6 +477,7 @@ class UISettings(QDialog):
 
     @pyqtSlot()
     def On_ShowSetting(self):
+        os.system("sudo ifconfig usb0:avahi 192.168.7.1 netmask 255.255.255.0 up")
         dlg = LoginDialog(self)
         if not dlg.exec_():
             return 
@@ -778,19 +779,22 @@ class UISettings(QDialog):
     def DrawResultTop(self):
         self.ClearImageShow.emit(0x1)
         self.imageTop.imagedresult = 0
-        self.imageLeft.DrawImageResults(self.imageresults[PhotoViewer.CAMERA.TOP.value], self.ProfileImages[PhotoViewer.CAMERA.TOP.value].copy(self.ProfileImages[PhotoViewer.CAMERA.TOP.value].rect()))
+        self.imageTop.DrawImageResults(self.imageresults[PhotoViewer.CAMERA.TOP.value], 
+            self.ProfileImages[PhotoViewer.CAMERA.TOP.value].copy(self.ProfileImages[PhotoViewer.CAMERA.TOP.value].rect()))
 
     def DrawResultLeft(self):
         #self.lblImageLeft.clear()
         self.ClearImageShow.emit(0x2)
         self.imageLeft.imagedresult = 0
-        self.imageLeft.DrawImageResults(self.imageresults[PhotoViewer.CAMERA.LEFT.value], self.ProfileImages[PhotoViewer.CAMERA.LEFT.value].copy(self.ProfileImages[PhotoViewer.CAMERA.LEFT.value].rect()))
+        self.imageLeft.DrawImageResults(self.imageresults[PhotoViewer.CAMERA.LEFT.value], 
+            self.ProfileImages[PhotoViewer.CAMERA.LEFT.value].copy(self.ProfileImages[PhotoViewer.CAMERA.LEFT.value].rect()))
 
     def DrawResultRight(self):
         #self.lblImageRight.clear()
         self.ClearImageShow.emit(0x4)
         self.imageRight.imagedresult = 0
-        self.imageRight.DrawImageResults(self.imageresults[PhotoViewer.CAMERA.RIGHT.value], self.ProfileImages[PhotoViewer.CAMERA.RIGHT.value].copy(self.ProfileImages[PhotoViewer.CAMERA.RIGHT.value].rect()))
+        self.imageRight.DrawImageResults(self.imageresults[PhotoViewer.CAMERA.RIGHT.value], 
+            self.ProfileImages[PhotoViewer.CAMERA.RIGHT.value].copy(self.ProfileImages[PhotoViewer.CAMERA.RIGHT.value].rect()))
 
     def _loadProfile(self):
         self.imageTop.DrawProfile(self.profilename)
@@ -815,6 +819,8 @@ class UISettings(QDialog):
 
     @pyqtSlot()
     def on_startclick(self):
+        os.system("sudo ifconfig usb0:avahi 192.168.7.1 netmask 255.255.255.0 up")
+
         if self.isProfilestatus:
             return
 
@@ -1098,10 +1104,13 @@ def CreateLog():
     logger.addHandler(handler)
     return logger
 
+
+
 if __name__ == "__main__":
     #%(threadName)s       %(thread)d
     #logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s - %(name)s[%(thread)d] - %(levelname)s - %(message)s')
-    os.system(os.path.join(os.path.dirname(os.path.realpath(__file__)),"zerousbssh.sh"))
+    #os.system("ifconfig usb0:avahi")
+
     logger = CreateLog()
     app = QApplication(sys.argv)
     QApplication.processEvents()

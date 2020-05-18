@@ -1,2 +1,2 @@
-cd /home/qa/Desktop/pyUI
+cd /home/qa/Desktop/jetsonUI
 python3 psi_jetson.py

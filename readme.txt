@@ -187,6 +187,12 @@ pip install scikit-image==0.16.2
 ## sudo no password
 ## sudo visudo
 ###  qa     ALL=(ALL) NOPASSWD:ALL
+##############  crash 
+## sudo rm /var/crash/*
+## sudo vim /etc/default/apport     enable=0
+#####auto start
+## gnome-session-properties
+
 
 
 sudo apt-get update && sudo apt-get upgrade
