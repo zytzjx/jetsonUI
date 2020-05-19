@@ -723,6 +723,7 @@ class UISettings(QDialog):
         smplfilename=os.path.join(self._profilepath, self._DirSub(index), self.profilename+".jpg")
         self.logger.info(txtfilename)
         self.logger.info(smplfilename)
+        self.imageresults[index] = []
         if os.path.exists(txtfilename) and os.path.exists(smplfilename):
             self.logger.info("*testScrews**")
             try:
