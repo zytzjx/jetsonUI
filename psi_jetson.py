@@ -961,6 +961,11 @@ class UISettings(QDialog):
         self.imageTop.setImageScale() 
         self.imageLeft.setImageScale() 
         self.imageRight.setImageScale() 
+        for a in range(0, 5):
+            os.system("sudo ifconfig usb0:avahi 192.168.7.1 netmask 255.255.255.0 up")
+            self.logger.info("config ip")
+            time.sleep(2)
+
 
 
     def OnPreview(self):
