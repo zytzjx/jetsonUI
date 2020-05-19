@@ -477,7 +477,7 @@ class UISettings(QDialog):
 
     @pyqtSlot()
     def On_ShowSetting(self):
-        os.system("sudo ifconfig usb0:avahi 192.168.7.1 netmask 255.255.255.0 up")
+        os.system(LOCALCMD)
         dlg = LoginDialog(self)
         if not dlg.exec_():
             return 
@@ -819,7 +819,7 @@ class UISettings(QDialog):
 
     @pyqtSlot()
     def on_startclick(self):
-        os.system("sudo ifconfig usb0:avahi 192.168.7.1 netmask 255.255.255.0 up")
+        os.system(LOCALCMD)
 
         if self.isProfilestatus:
             return
@@ -962,7 +962,7 @@ class UISettings(QDialog):
         self.imageLeft.setImageScale() 
         self.imageRight.setImageScale() 
         for a in range(0, 5):
-            os.system("sudo ifconfig usb0:avahi 192.168.7.1 netmask 255.255.255.0 up")
+            os.system(LOCALCMD)
             self.logger.info("config ip")
             time.sleep(2)
 

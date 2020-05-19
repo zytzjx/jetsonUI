@@ -15,6 +15,8 @@ URL_LEFT='http://%s:8888' % IP_LEFT
 #IP_RIGHT='192.168.1.26'
 IP_RIGHT='192.168.7.2'
 URL_RIGHT='http://%s:8080' % IP_RIGHT
+#LOCALCMD='sudo ifconfig usb0:avahi 192.168.7.1 netmask 255.255.255.0 up'
+LOCALCMD='sudo ifconfig eth0 169.254.248.100 netmask 255.255.0.0 up'
 
 #IP_TOP='192.168.1.25'
 IP_TOP='169.254.38.40'
