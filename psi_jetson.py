@@ -477,7 +477,7 @@ class UISettings(QDialog):
 
     @pyqtSlot()
     def On_ShowSetting(self):
-        os.system(LOCALCMD)
+        os.system(myconstdef.LOCALCMD)
         dlg = LoginDialog(self)
         if not dlg.exec_():
             return 
@@ -820,7 +820,7 @@ class UISettings(QDialog):
 
     @pyqtSlot()
     def on_startclick(self):
-        os.system(LOCALCMD)
+        os.system(myconstdef.LOCALCMD)
 
         if self.isProfilestatus:
             return
@@ -963,7 +963,7 @@ class UISettings(QDialog):
         self.imageLeft.setImageScale() 
         self.imageRight.setImageScale() 
         for a in range(0, 5):
-            os.system(LOCALCMD)
+            os.system(myconstdef.LOCALCMD)
             self.logger.info("config ip")
             time.sleep(2)
 
