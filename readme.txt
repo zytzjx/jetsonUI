@@ -222,3 +222,19 @@ python3 -m pip install dataclasses
 sudo apt-get update
 sudo apt-get install avahi-daemon avahi-discover libnss-mdns
 avahi-autoipd -D usb0
+
+##install new Desktop
+sudo apt-get -y purge ubuntu-desktop
+sudo apt-get -y purge unity gnome-shell lightdm
+sudo apt-get -y remove ubuntu-desktop
+sudo apt purge ubuntu-desktop -y && sudo apt autoremove -y && sudo apt autoclean
+sudo apt-get purge ubuntu-desktop -y
+sudo apt-get -y clean
+sudo apt-get -y autoremove
+sudo apt-get -f install
+
+sudo apt-get install --no-install-recommends ubuntu-desktop
+apt-cache show ubuntu-desktop
+
+sudo vim /etc/gdm3/custom.conf
+
