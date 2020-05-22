@@ -147,6 +147,7 @@ class UISettings(QDialog):
         self.pbtabSetting.clicked.connect(self.On_settingChange)
         self.pbtabProfile.clicked.connect(self.On_settingChange)
         self.pbExitSetting.clicked.connect(self.On_ExitSettingMode)
+        self.pbProfileDelete.clicked.connect(self.On_DeleteProfile)
 
         self.pbStart.clicked.connect(self.on_startclick)
         self.pbFinish.clicked.connect(self.on_startPreview)

@@ -965,7 +965,7 @@ color: rgb(0, 0, 0);</string>
                        </widget>
                       </item>
                       <item>
-                       <widget class="QPushButton" name="pbProfileUpdate">
+                       <widget class="QPushButton" name="pbProfileDelete">
                         <property name="minimumSize">
                          <size>
                           <width>0</width>
@@ -987,7 +987,7 @@ color: rgb(0, 0, 0);</string>
 		QPushButton:pressed{background-color:rgb(85, 170, 255);</string>
                         </property>
                         <property name="text">
-                         <string>Update</string>
+                         <string>Delete</string>
                         </property>
                        </widget>
                       </item>
