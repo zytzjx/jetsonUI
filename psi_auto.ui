@@ -1643,7 +1643,7 @@ color: rgb(0, 0, 0);</string>
   <tabstop>listWidget</tabstop>
   <tabstop>pbProfileSelect</tabstop>
   <tabstop>pbProfileEdit</tabstop>
-  <tabstop>pbProfileUpdate</tabstop>
+  <tabstop>pbProfileDelete</tabstop>
   <tabstop>pbProfileNew</tabstop>
   <tabstop>sbRepeatTime</tabstop>
   <tabstop>pbDryRunStart</tabstop>
