@@ -17,8 +17,6 @@ git config --global user.name "Chris Chen"
 nvarguscamerasrc sensor-id=0 ! video/x-raw(memory:NVMM), width=(int)2464, height=(int)3264, format=(string)NV12, framerate=(fraction)10/1 ! 
 nvvidconv flip-method=1 ! video/x-raw, width=(int)2464, height=(int)3264, format=(string)RGBA! videoconvert ! video/x-raw, format=(string)BGR ! appsink
 
-
-
 gst-launch-1.0 -v videotestsrc ! videoconvert ! videoscale ! video/x-raw,format=I420,width=800,height=600,framerate=25/1 ! jpegenc ! rtpjpegpay ! udpsink host=127.0.0.1 port=5000
 gst-launch-1.0 udpsrc port=5000 ! application/x-rtp,encoding-name=JPEG,payload=26 ! rtpjpegdepay ! jpegdec ! autovideosink
 

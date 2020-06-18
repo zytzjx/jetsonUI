@@ -228,7 +228,7 @@ class CSI_Camera:
         flip_method=1,
     ):
         return (
-            "nvarguscamerasrc sensor-id=%d ! "
+            "nvarguscamerasrc exposurecompensation=1 sensor-id=%d ! "
             "video/x-raw(memory:NVMM), width=(int)%d, height=(int)%d, format=(string)NV12, framerate=(fraction)%d/1 ! "
             "nvvidconv flip-method=%d ! "
             "video/x-raw, width=(int)%d, height=(int)%d, format=(string)I420 ! "
